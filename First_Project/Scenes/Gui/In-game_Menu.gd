@@ -1,17 +1,14 @@
 extends Control
 
 var in_gui = false
-
-func _ready():
-	pass # Replace with function body.
-
+var attack_button = false
+var hold_button = false
 
 func _on_attack_button_pressed():
-	pass # Replace with function body.
-
+	get_tree().call_group("unit", "attack")
 
 func _on_hold_button_pressed():
-	pass # Replace with function body.
+	hold_button = true
 
 
 func _on_area_2d_mouse_entered():

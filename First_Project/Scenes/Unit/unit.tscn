@@ -1,10 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjnstwmg5vpj4"]
+[gd_scene load_steps=7 format=3 uid="uid://cjnstwmg5vpj4"]
 
 [ext_resource type="Texture2D" uid="uid://bm32iaexfqqhk" path="res://Assets/Player.png" id="1_2n08m"]
 [ext_resource type="Script" path="res://Scenes/Unit/unit.gd" id="1_n7omw"]
 [ext_resource type="Texture2D" uid="uid://clnfyrj72svyx" path="res://Assets/Player_Selected.png" id="2_qcl8e"]
 [ext_resource type="PackedScene" uid="uid://d02vyaejld3cs" path="res://Scenes/Unit/unit_sm.tscn" id="4_tl1mu"]
-[ext_resource type="Script" path="res://Scenes/Unit/unit_sm.gd" id="5_rrgsr"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_msnna"]
 radius = 175.0
@@ -36,7 +35,6 @@ texture = ExtResource("1_2n08m")
 [node name="attackTimer" type="Timer" parent="."]
 
 [node name="UnitSM" parent="." instance=ExtResource("4_tl1mu")]
-script = ExtResource("5_rrgsr")
 
 [node name="Hitbox" type="CollisionShape2D" parent="."]
 visible = false

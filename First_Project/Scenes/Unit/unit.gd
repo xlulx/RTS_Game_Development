@@ -45,6 +45,8 @@ func select():
 func deselect():
 	selected = false
 	$Selected.visible = false
+	get_node("UnitSM").command_mod = null
+	get_node("/root/Game/Camera").red_click = false
 
 #Görüş alanına girip çıkanları listeye ekleme çıkarma
 func _on_vision_range_body_entered(body):
@@ -94,3 +96,8 @@ func take_damage(amount) -> bool :
 
 func get_state():
 	return state_machine.state
+
+func attack():
+	if selected:
+		get_node("UnitSM").command_mod = get_node("UnitSM").CommandMods.ATTACK_MOVE
+		get_node("/root/Game/Camera").red_click = true

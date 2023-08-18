@@ -25,7 +25,7 @@ func _ready():
 
 #Girdi alma
 func _input(_event):
-	if parent.selected and state != states.dying :
+	if parent.selected and state != states.dying:
 		if Input.is_action_just_pressed("attack_move"):
 			command_mod = CommandMods.ATTACK_MOVE
 		if Input.is_action_just_pressed("hold"):
@@ -120,9 +120,6 @@ func _get_transition(_delta):
 		states.dying :
 			pass
 
-#Ölüm
-func died():
-	set_state(states.dying)
 
 func _on_attack_timer_timeout():
 	match state :
@@ -139,5 +136,9 @@ func _on_attack_timer_timeout():
 				set_state(states.idle)
 		states.dying :
 			parent.queue_free()
+
+#Ölüm
+func died():
+	set_state(states.dying)
 
 

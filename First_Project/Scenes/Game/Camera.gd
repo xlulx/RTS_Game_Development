@@ -29,12 +29,6 @@ var r_zoom = Vector2.ZERO
 #var max_zoom = 2.0
 #var zoom_speed = 0.01
 
-
-
-
-
-
-
 #func _input(event):
 	
 	#Zoom hareketi
@@ -44,7 +38,6 @@ var r_zoom = Vector2.ZERO
 #		$Camera2D.zoom -= zoom
 
 func _process(delta):
-	
 	#Farenin yerini bulma
 	mouse_position = get_local_mouse_position()
 	global_mouse_position = get_global_mouse_position()
@@ -89,6 +82,7 @@ func _process(delta):
 	if Input.is_action_just_pressed("right_click") and selected:
 		var click = Click_Animation.instantiate()
 		add_sibling(click)
+		
 
 	#Kamera Hareketi
 	var camera_movement = Vector2.ZERO

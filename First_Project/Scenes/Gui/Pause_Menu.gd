@@ -16,4 +16,4 @@ func _on_resume_game_pressed():
 
 func _on_menu_pressed():
 	get_tree().paused = !is_paused
-	get_tree().change_scene_to_file("res://Scenes/menu.tscn")
+	get_tree().change_scene_to_file("res://Scenes/Gui/Main_Menu/menu.tscn")
