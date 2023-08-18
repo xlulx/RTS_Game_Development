@@ -1,0 +1,121 @@
+[gd_scene load_steps=4 format=3 uid="uid://dljli3qnjs15i"]
+
+[ext_resource type="Script" path="res://Scenes/Gui/Pause_Menu.gd" id="1_e24c3"]
+[ext_resource type="Script" path="res://Scenes/Gui/In-game_Menu.gd" id="1_xnaax"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_p5uj6"]
+size = Vector2(156, 56)
+
+[node name="Gui" type="CanvasLayer"]
+
+[node name="In-game_Menu" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_xnaax")
+metadata/_edit_use_anchors_ = true
+
+[node name="MarginContainer" type="MarginContainer" parent="In-game_Menu"]
+layout_mode = 2
+offset_left = 245.0
+offset_top = 592.0
+offset_right = 402.0
+offset_bottom = 648.0
+mouse_filter = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Command_Panel" type="HBoxContainer" parent="In-game_Menu/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Attack_Button" type="Button" parent="In-game_Menu/MarginContainer/Command_Panel"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+mouse_filter = 1
+text = "Attack"
+
+[node name="Hold_Button" type="Button" parent="In-game_Menu/MarginContainer/Command_Panel"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+mouse_filter = 1
+text = "Hold"
+
+[node name="Area2D" type="Area2D" parent="In-game_Menu"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
+position = Vector2(322, 620)
+shape = SubResource("RectangleShape2D_p5uj6")
+
+[node name="Pause_Menu" type="Control" parent="."]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_e24c3")
+
+[node name="ColorRect" type="ColorRect" parent="Pause_Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0980392, 0.0980392, 0.0980392, 0.227451)
+
+[node name="CenterContainer" type="CenterContainer" parent="Pause_Menu"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Buttons" type="VBoxContainer" parent="Pause_Menu/CenterContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+theme_override_constants/separation = 20
+
+[node name="Game Paused" type="Label" parent="Pause_Menu/CenterContainer/Buttons"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 40
+text = "Game Paused"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="Pause_Menu/CenterContainer/Buttons"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="Resume Game" type="Button" parent="Pause_Menu/CenterContainer/Buttons/MarginContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Resume Game"
+
+[node name="MarginContainer2" type="MarginContainer" parent="Pause_Menu/CenterContainer/Buttons"]
+layout_mode = 2
+theme_override_constants/margin_left = 25
+theme_override_constants/margin_right = 25
+
+[node name="Menu" type="Button" parent="Pause_Menu/CenterContainer/Buttons/MarginContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 25
+text = "Back to Menu"
+
+[connection signal="pressed" from="In-game_Menu/MarginContainer/Command_Panel/Attack_Button" to="In-game_Menu" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/MarginContainer/Command_Panel/Hold_Button" to="In-game_Menu" method="_on_hold_button_pressed"]
+[connection signal="mouse_entered" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_entered"]
+[connection signal="mouse_exited" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_exited"]
+[connection signal="pressed" from="Pause_Menu/CenterContainer/Buttons/MarginContainer/Resume Game" to="Pause_Menu" method="_on_resume_game_pressed"]
+[connection signal="pressed" from="Pause_Menu/CenterContainer/Buttons/MarginContainer2/Menu" to="Pause_Menu" method="_on_menu_pressed"]

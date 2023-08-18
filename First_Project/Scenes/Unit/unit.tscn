@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://cjnstwmg5vpj4"]
+
+[ext_resource type="Texture2D" uid="uid://bm32iaexfqqhk" path="res://Assets/Player.png" id="1_2n08m"]
+[ext_resource type="Script" path="res://Scenes/Unit/unit.gd" id="1_n7omw"]
+[ext_resource type="Texture2D" uid="uid://clnfyrj72svyx" path="res://Assets/Player_Selected.png" id="2_qcl8e"]
+[ext_resource type="PackedScene" uid="uid://d02vyaejld3cs" path="res://Scenes/Unit/unit_sm.tscn" id="4_tl1mu"]
+[ext_resource type="Script" path="res://Scenes/Unit/unit_sm.gd" id="5_rrgsr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_msnna"]
+radius = 175.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_jl6qe"]
+radius = 15.0
+
+[node name="Unit" type="CharacterBody2D" groups=["unit"]]
+script = ExtResource("1_n7omw")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="."]
+path_postprocessing = 1
+
+[node name="VisionRange" type="Area2D" parent="."]
+visible = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VisionRange"]
+shape = SubResource("CircleShape2D_msnna")
+
+[node name="Selected" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_qcl8e")
+
+[node name="Skin" type="Sprite2D" parent="."]
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("1_2n08m")
+
+[node name="attackTimer" type="Timer" parent="."]
+
+[node name="UnitSM" parent="." instance=ExtResource("4_tl1mu")]
+script = ExtResource("5_rrgsr")
+
+[node name="Hitbox" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_jl6qe")
+
+[connection signal="body_entered" from="VisionRange" to="." method="_on_vision_range_body_entered"]
+[connection signal="body_exited" from="VisionRange" to="." method="_on_vision_range_body_exited"]
+[connection signal="timeout" from="attackTimer" to="UnitSM" method="_on_attack_timer_timeout"]
