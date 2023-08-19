@@ -8,7 +8,7 @@ func _on_attack_button_pressed():
 	get_tree().call_group("unit", "attack")
 
 func _on_hold_button_pressed():
-	hold_button = true
+	get_tree().call_group("unit", "hold")
 
 
 func _on_area_2d_mouse_entered():

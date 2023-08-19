@@ -34,7 +34,6 @@ func _input(_event):
 		if Input.is_action_just_released("right_click"):
 			command = Commands.NONE
 			parent.movement_target = get_node("/root/Game/Camera").global_mouse_position
-			parent.nav.target_position = parent.movement_target
 			set_state(states.moving)
 			match command_mod:
 				CommandMods.NONE:
@@ -50,6 +49,7 @@ func _state_logic(_delta):
 			pass
 		states.moving :
 			parent.move_to_target(_delta, parent.movement_target)
+			parent.skin.rotation = parent.position.angle_to_point(parent.movement_target)
 		states.engaging :
 			if parent.attack_target.get_ref():
 				parent.move_to_target(_delta, parent.attack_target.get_ref().position)
@@ -67,13 +67,13 @@ func _enter_state(_new_state, _old_state):
 		states.idle :
 			pass
 		states.moving :
-			parent.skin.rotation = parent.position.angle_to_point(parent.movement_target)
+			pass
 		states.engaging :
 			pass
 		states.attacking :
 			pass
 		states.dying :
-			pass
+			parent.queue_free()
 
 func _exit_state(old_state, new_state):
 	match old_state:
@@ -135,7 +135,7 @@ func _on_attack_timer_timeout():
 			else:
 				set_state(states.idle)
 		states.dying :
-			parent.queue_free()
+			pass
 
 #Ölüm
 func died():

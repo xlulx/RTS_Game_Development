@@ -10,11 +10,11 @@ var movement_target = Vector2.ZERO
 var speed = 120
 var target_max = 10
 var move_threshold = 2
+var new_velocity = Vector2.ZERO
 
 #Saldırı değişkenleri
 var attack_target = null
 var attack_range = 45
-var health = 20
 var damage = 3
 var possible_targets = []
 
@@ -23,10 +23,14 @@ var possible_targets = []
 @onready var skin = $Skin
 @onready var attack_timer = $attackTimer
 @onready var nav = $NavigationAgent2D
+@onready var health_Bar = $HealthBar
 var enemy_skin = load("res://Assets/Enemy.png")
 
 #başlama fonksiyonu
 func _ready():
+	health_Bar.value = 20
+	health_Bar.max_value = health_Bar.value
+	
 	movement_target = position
 	if unit_Owner == 1 :
 		skin.texture = enemy_skin
@@ -35,7 +39,8 @@ func _ready():
 func move_to_target(_delta, tar):
 	nav.target_position = tar
 	velocity = Vector2.ZERO
-	velocity = position.direction_to(nav.get_next_path_position()) * speed
+	new_velocity = position.direction_to(nav.get_next_path_position()) * speed
+	velocity = velocity.move_toward(new_velocity, 120)
 	move_and_slide()
 
 #Seçili olup olmadığını gösterme
@@ -87,8 +92,8 @@ func target_within_range() -> bool:
 		return false
 
 func take_damage(amount) -> bool :
-	health -= amount
-	if health  <= 0 :
+	health_Bar.value -= amount
+	if health_Bar.value  <= 0 :
 		state_machine.died()
 		return false
 	else :
@@ -101,3 +106,8 @@ func attack():
 	if selected:
 		get_node("UnitSM").command_mod = get_node("UnitSM").CommandMods.ATTACK_MOVE
 		get_node("/root/Game/Camera").red_click = true
+		
+func hold():
+	if selected:
+		get_node("UnitSM").command = get_node("UnitSM").Commands.HOLD
+		get_node("UnitSM").set_state(get_node("UnitSM").states.idle)
