@@ -1,10 +1,13 @@
-[gd_scene load_steps=4 format=3 uid="uid://dljli3qnjs15i"]
+[gd_scene load_steps=5 format=3 uid="uid://dljli3qnjs15i"]
 
 [ext_resource type="Script" path="res://Scenes/Gui/Pause_Menu.gd" id="1_e24c3"]
 [ext_resource type="Script" path="res://Scenes/Gui/In-game_Menu.gd" id="1_xnaax"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p5uj6"]
 size = Vector2(156, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qfu01"]
+size = Vector2(136, 304)
 
 [node name="Gui" type="CanvasLayer"]
 
@@ -19,7 +22,7 @@ mouse_filter = 2
 script = ExtResource("1_xnaax")
 metadata/_edit_use_anchors_ = true
 
-[node name="MarginContainer" type="MarginContainer" parent="In-game_Menu"]
+[node name="Command_Panel" type="MarginContainer" parent="In-game_Menu"]
 layout_mode = 2
 offset_left = 245.0
 offset_top = 592.0
@@ -31,27 +34,48 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="Command_Panel" type="HBoxContainer" parent="In-game_Menu/MarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="In-game_Menu/Command_Panel"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
-[node name="Attack_Button" type="Button" parent="In-game_Menu/MarginContainer/Command_Panel"]
+[node name="Attack_Button" type="Button" parent="In-game_Menu/Command_Panel/HBoxContainer"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 mouse_filter = 1
 text = "Attack"
 
-[node name="Hold_Button" type="Button" parent="In-game_Menu/MarginContainer/Command_Panel"]
+[node name="Hold_Button" type="Button" parent="In-game_Menu/Command_Panel/HBoxContainer"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 mouse_filter = 1
 text = "Hold"
 
+[node name="Units_Panel" type="MarginContainer" parent="In-game_Menu"]
+layout_mode = 1
+anchors_preset = 4
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_top = -148.0
+offset_right = 135.0
+offset_bottom = 152.0
+grow_vertical = 2
+
+[node name="ItemList" type="ItemList" parent="In-game_Menu/Units_Panel"]
+layout_mode = 2
+max_columns = 2
+same_column_width = true
+fixed_column_width = 55
+icon_mode = 0
+
 [node name="Area2D" type="Area2D" parent="In-game_Menu"]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
+[node name="Command_Panel" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
 position = Vector2(322, 620)
 shape = SubResource("RectangleShape2D_p5uj6")
+
+[node name="Units_Panel" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
+position = Vector2(68, 328)
+shape = SubResource("RectangleShape2D_qfu01")
 
 [node name="Pause_Menu" type="Control" parent="."]
 process_mode = 3
@@ -113,8 +137,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "Back to Menu"
 
-[connection signal="pressed" from="In-game_Menu/MarginContainer/Command_Panel/Attack_Button" to="In-game_Menu" method="_on_attack_button_pressed"]
-[connection signal="pressed" from="In-game_Menu/MarginContainer/Command_Panel/Hold_Button" to="In-game_Menu" method="_on_hold_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/Command_Panel/HBoxContainer/Attack_Button" to="In-game_Menu" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/Command_Panel/HBoxContainer/Hold_Button" to="In-game_Menu" method="_on_hold_button_pressed"]
+[connection signal="item_clicked" from="In-game_Menu/Units_Panel/ItemList" to="In-game_Menu" method="_on_item_list_item_clicked"]
 [connection signal="mouse_entered" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_exited"]
 [connection signal="pressed" from="Pause_Menu/CenterContainer/Buttons/MarginContainer/Resume Game" to="Pause_Menu" method="_on_resume_game_pressed"]

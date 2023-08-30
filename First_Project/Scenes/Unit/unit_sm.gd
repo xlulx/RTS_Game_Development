@@ -31,7 +31,7 @@ func _input(_event):
 		if Input.is_action_just_pressed("hold"):
 			command = Commands.HOLD
 			set_state(states.idle)
-		if Input.is_action_just_released("right_click"):
+		if Input.is_action_just_released("right_click") and !get_node("/root/Game/Camera").is_mouse_on_gui:
 			command = Commands.NONE
 			parent.movement_target = get_node("/root/Game/Camera").global_mouse_position
 			set_state(states.moving)

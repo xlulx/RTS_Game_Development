@@ -24,10 +24,15 @@ var possible_targets = []
 @onready var attack_timer = $attackTimer
 @onready var nav = $NavigationAgent2D
 @onready var health_Bar = $HealthBar
+var items
+var Camera
 var enemy_skin = load("res://Assets/Enemy.png")
 
 #başlama fonksiyonu
 func _ready():
+	Camera = get_node("/root/Game/Camera")
+	items = get_node("/root/Game/Gui/In-game_Menu/Units_Panel/ItemList")
+	
 	health_Bar.value = 20
 	health_Bar.max_value = health_Bar.value
 	
@@ -45,13 +50,23 @@ func move_to_target(_delta, tar):
 
 #Seçili olup olmadığını gösterme
 func select():
+	items.add_item("Unit")
 	selected = true
 	$Selected.visible = true
-func deselect():
-	selected = false
-	$Selected.visible = false
-	get_node("UnitSM").command_mod = null
-	get_node("/root/Game/Camera").red_click = false
+
+func deselect(index,Name):
+	if self == Name :
+		items.remove_item(index)
+		selected = false
+		$Selected.visible = false
+		state_machine.command_mod = null
+		Camera.selected.pop_at(index)
+	elif index == null:
+		items.clear()
+		selected = false
+		$Selected.visible = false
+		state_machine.command_mod = null
+		Camera.red_click = false
 
 #Görüş alanına girip çıkanları listeye ekleme çıkarma
 func _on_vision_range_body_entered(body):
@@ -104,10 +119,10 @@ func get_state():
 
 func attack():
 	if selected:
-		get_node("UnitSM").command_mod = get_node("UnitSM").CommandMods.ATTACK_MOVE
-		get_node("/root/Game/Camera").red_click = true
+		state_machine.command_mod = state_machine.CommandMods.ATTACK_MOVE
+		Camera.red_click = true
 		
 func hold():
 	if selected:
-		get_node("UnitSM").command = get_node("UnitSM").Commands.HOLD
-		get_node("UnitSM").set_state(get_node("UnitSM").states.idle)
+		state_machine.command = state_machine.Commands.HOLD
+		state_machine.set_state(state_machine.states.idle)

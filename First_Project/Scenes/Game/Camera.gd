@@ -24,47 +24,36 @@ var is_mouse_on_gui = false
 var camera_speed = 320
 var screen_edge_threshold = 10
 var r_zoom = Vector2.ZERO
-#var zoom_power = 0.015
-#var zoom = Vector2(zoom_power,zoom_power)
-#var min_zoom = 0.5
-#var max_zoom = 2.0
-#var zoom_speed = 0.01
 
-#func _input(event):
-	
-	#Zoom hareketi
-#	if event is InputEventMouseButton and event.button_index == 4 and $Camera2D.zoom.x < 1.5:
-#		$Camera2D.zoom += zoom
-#	if event is InputEventMouseButton and event.button_index == 5 and $Camera2D.zoom.x > 0.8:
-#		$Camera2D.zoom -= zoom
+#Diğer değişkenler
 
 func _process(delta):
 	#Farenin yerini bulma
 	mouse_position = get_local_mouse_position()
 	global_mouse_position = get_global_mouse_position()
+	is_mouse_on_gui = get_node("/root/Game/Gui/In-game_Menu").in_gui
+	
 	
 	#Attack tuşu
 	if Input.is_action_pressed("attack_move"):
 		red_click = true
-
 	#Sol tık
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and 10 < drag_start.distance_to(mouse_position):
 		if Input.is_action_just_pressed("left_click") :
 			is_left_pressed = true
-			is_mouse_on_gui = get_node("/root/Game/Gui/In-game_Menu").in_gui
+			drag_start = mouse_position
 			if !is_mouse_on_gui:
 				for unit in weakref_selected:
 					if unit.get_ref():
-						unit.get_ref().deselect()
+						unit.get_ref().deselect(null,null)
 				selected = []
-				drag_start = mouse_position
 				global_drag_start = global_mouse_position
 				dragging = true
 				relative_rect = position / r_zoom
 		#Seçim alanının çizimi
 		select_draw.update_status(drag_start + ((relative_rect - position/r_zoom)), mouse_position , dragging)
 	#Çizimin bitimi ve birimleri seçme
-	elif Input.is_action_just_released("left_click") and !is_mouse_on_gui and is_left_pressed:
+	elif Input.is_action_just_released("left_click") and 10 < drag_start.distance_to(mouse_position) and is_left_pressed:
 		dragging = false
 		select_draw.update_status(drag_start + ((relative_rect - position/r_zoom)), mouse_position, dragging)
 		var global_drag_end = global_mouse_position
@@ -80,9 +69,11 @@ func _process(delta):
 				if unit.collider.unit_Owner == 0 :
 					unit.collider.select()
 					weakref_selected.append(weakref(unit.collider))
+	elif is_mouse_on_gui :
+		drag_start = mouse_position
 	
 	#Sağ tık
-	if Input.is_action_just_pressed("right_click") and selected:
+	if Input.is_action_just_pressed("right_click") and selected and !is_mouse_on_gui:
 		var click = Click_Animation.instantiate()
 		add_sibling(click)
 		

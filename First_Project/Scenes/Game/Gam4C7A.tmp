@@ -83,27 +83,35 @@ unit_Owner = 1
 
 [node name="Unit1" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(200, 200)
+unit_Owner = null
 
 [node name="Unit2" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(256, 200)
+unit_Owner = null
 
 [node name="Unit3" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(200, 264)
+unit_Owner = null
 
 [node name="Unit4" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(256, 264)
+unit_Owner = null
 
 [node name="Unit5" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(200, 328)
+unit_Owner = null
 
 [node name="Unit6" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(256, 328)
+unit_Owner = null
 
 [node name="Unit7" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(200, 392)
+unit_Owner = null
 
 [node name="Unit8" parent="Enemies" instance=ExtResource("3_elo0m")]
 position = Vector2(256, 392)
+unit_Owner = null
 
 [node name="Camera" type="Node2D" parent="."]
 script = ExtResource("4_bltdg")

@@ -1,4 +1,8 @@
 res://Scenes/Game/Game.tscn
 res://Assets/Theme/Main_Theme.tres
 res://Scenes/Unit/unit.tscn
+res://Scenes/Gui/Gui.tscn
+res://Scenes/Gui/In-game_Menu.gd
+res://Scenes/Unit/unit.gd
 res://Scenes/Game/Camera.gd
+res://Scenes/Unit/unit_sm.gd
