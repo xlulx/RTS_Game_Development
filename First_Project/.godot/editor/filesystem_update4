@@ -1,2 +1,4 @@
 res://Scenes/Game/Game.tscn
 res://Assets/Theme/Main_Theme.tres
+res://Scenes/Unit/unit.tscn
+res://Scenes/Game/Camera.gd

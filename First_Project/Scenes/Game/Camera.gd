@@ -1,6 +1,7 @@
 extends Node2D
 
 #Seçim karesi
+var is_left_pressed = false
 var dragging = false
 var weakref_selected = []
 var selected = []
@@ -49,6 +50,7 @@ func _process(delta):
 	#Sol tık
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		if Input.is_action_just_pressed("left_click") :
+			is_left_pressed = true
 			is_mouse_on_gui = get_node("/root/Game/Gui/In-game_Menu").in_gui
 			if !is_mouse_on_gui:
 				for unit in weakref_selected:
@@ -62,16 +64,17 @@ func _process(delta):
 		#Seçim alanının çizimi
 		select_draw.update_status(drag_start + ((relative_rect - position/r_zoom)), mouse_position , dragging)
 	#Çizimin bitimi ve birimleri seçme
-	elif Input.is_action_just_released("left_click") and !is_mouse_on_gui :
+	elif Input.is_action_just_released("left_click") and !is_mouse_on_gui and is_left_pressed:
 		dragging = false
 		select_draw.update_status(drag_start + ((relative_rect - position/r_zoom)), mouse_position, dragging)
 		var global_drag_end = global_mouse_position
 		select_rectangle.extents = abs((global_drag_end - global_drag_start) / 2)
 		var space = get_world_2d().direct_space_state
 		var query = PhysicsShapeQueryParameters2D.new()
+		query.collision_mask = 2
 		query.set_shape(select_rectangle)
 		query.transform = Transform2D(0, ((global_drag_end + global_drag_start)/2))
-		selected = space.intersect_shape(query)
+		selected = space.intersect_shape(query, 128)
 		for unit in selected:
 			if unit.collider.is_in_group("unit"):
 				if unit.collider.unit_Owner == 0 :

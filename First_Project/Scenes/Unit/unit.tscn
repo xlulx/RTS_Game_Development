@@ -13,6 +13,7 @@ radius = 175.0
 radius = 15.0
 
 [node name="Unit" type="CharacterBody2D" groups=["unit"]]
+collision_layer = 3
 script = ExtResource("1_n7omw")
 
 [node name="VisionRange" type="Area2D" parent="."]
