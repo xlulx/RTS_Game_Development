@@ -24,9 +24,10 @@ var possible_targets = []
 @onready var attack_timer = $attackTimer
 @onready var nav = $NavigationAgent2D
 @onready var health_Bar = $HealthBar
+var enemy_skin = load("res://Assets/Enemy.png")
+
 var items
 var Camera
-var enemy_skin = load("res://Assets/Enemy.png")
 
 #başlama fonksiyonu
 func _ready():
@@ -60,7 +61,7 @@ func deselect(index,Name):
 		selected = false
 		$Selected.visible = false
 		state_machine.command_mod = null
-		Camera.selected.pop_at(index)
+		Camera.weakref_selected.pop_at(index)
 	elif index == null:
 		items.clear()
 		selected = false
@@ -91,6 +92,7 @@ func closest_target() -> unit :
 		return possible_targets[0]
 	else :
 		return null
+
 func closest_target_within_range() -> unit :
 	if closest_target():
 		if closest_target().position.distance_to(position) < attack_range:
