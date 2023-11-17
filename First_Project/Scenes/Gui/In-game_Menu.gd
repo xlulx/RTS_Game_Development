@@ -10,7 +10,14 @@ var Camera
 func _ready():
 	#Camera node'unu Camera değişkenine atar
 	Camera = get_node("/root/Game/Camera")
-
+	
+func _process(delta):
+	if list.get_item_count() != 0 :
+		visible = true
+	else :
+		Camera.selected = []
+		visible = false
+	
 #attack butonu
 func _on_attack_button_pressed():
 	#Unit'lerde bulunan attack fonksiyonunu çalıştırır
@@ -31,8 +38,8 @@ func _on_area_2d_mouse_exited():
 	#Mouse'un alandan çıktığını belirtir
 	is_mouse_on_gui = false
 
-#ItemList üzerinde bir iteme tıklandığında ; index, position ve mouse butonunun indexini veren fonksiyon
+#ItemList üzerinde bir iteme tıklandığında indexi veren fonksiyon
 func _on_item_list_item_clicked(index, _at_position, _mouse_button_index):
 	#Sağ tık ile iteme basıldığı takdirde Unit'lerde deselect fonksiyonunu çalıştırır.
 	if _mouse_button_index == 2 :
-		get_tree().call_group("unit", "deselect", index , Camera.weakref_selected[index].get_ref())
+		get_tree().call_group("unit", "deselect", index)

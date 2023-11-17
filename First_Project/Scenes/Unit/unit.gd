@@ -2,7 +2,10 @@ extends CharacterBody2D
 class_name unit
 
 #Sahiplik değişkeni
+#unit'in ait olduğu sahibi belirtir. sahip 0 = oyuncu
 @export var unit_Owner = 0
+#unit'in işaretinin tutulduğu değişken
+var unit_Mark
 
 #Hareket değişkenleri
 var selected = false
@@ -26,6 +29,7 @@ var possible_targets = []
 @onready var health_Bar = $HealthBar
 var enemy_skin = load("res://Assets/Enemy.png")
 
+#Nodes
 var items
 var Camera
 
@@ -49,25 +53,32 @@ func move_to_target(_delta, tar):
 	velocity = velocity.move_toward(new_velocity, 120)
 	move_and_slide()
 
-#Seçili olup olmadığını gösterme
+#Unit seçildiğinde başlayacak fonksiyon
 func select():
-	items.add_item("Unit")
+	items.add_item("Unit " + str(unit_Mark))
 	selected = true
 	$Selected.visible = true
 
-func deselect(index,Name):
-	if self == Name :
-		items.remove_item(index)
-		selected = false
-		$Selected.visible = false
-		state_machine.command_mod = null
-		Camera.weakref_selected.pop_at(index)
-	elif index == null:
-		items.clear()
-		selected = false
-		$Selected.visible = false
-		state_machine.command_mod = null
-		Camera.red_click = false
+#unit terk ediğildiğinde çalışacak fonksiyon
+func deselect(index):
+	if selected:
+		if index == unit_Mark :
+			items.remove_item(index)
+			unit_Mark = null
+			selected = false
+			$Selected.visible = false
+			state_machine.command_mod = null
+			Camera.red_click = false
+		if index == -1 :
+			items.clear()
+			unit_Mark = null
+			selected = false
+			$Selected.visible = false
+			state_machine.command_mod = null
+			Camera.red_click = false
+		if unit_Mark != null :
+			if index < unit_Mark :
+				unit_Mark -= 1
 
 #Görüş alanına girip çıkanları listeye ekleme çıkarma
 func _on_vision_range_body_entered(body):
@@ -108,6 +119,7 @@ func target_within_range() -> bool:
 	else :
 		return false
 
+#unit hasar aldığında çalışacak fonksiyon
 func take_damage(amount) -> bool :
 	health_Bar.value -= amount
 	if health_Bar.value  <= 0 :
@@ -119,11 +131,13 @@ func take_damage(amount) -> bool :
 func get_state():
 	return state_machine.state
 
+#unit e saldırı çağrısı yapılması için fonksiyon
 func attack():
 	if selected:
 		state_machine.command_mod = state_machine.CommandMods.ATTACK_MOVE
 		Camera.red_click = true
-		
+
+#unit e durma çağrısı yapılması için fonksiyon
 func hold():
 	if selected:
 		state_machine.command = state_machine.Commands.HOLD

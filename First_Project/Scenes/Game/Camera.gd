@@ -13,6 +13,8 @@ var is_mouse_on_gui = false
 #In-game_Menu node'unu tutan değişken
 var Gui
 
+var no_drag
+
 func _ready():
 	#In-game_Menu node'unu Gui değişkenine atama
 	Gui = get_node("/root/Game/Gui/In-game_Menu")
@@ -26,8 +28,17 @@ func _process(delta):
 	#Mouse'un gui üzerinde olup olmadığını kontrol etme
 	is_mouse_on_gui = Gui.is_mouse_on_gui
 	
+	#Mouse gui üzerinde ise dünya ile etkileşimi kesen fonksiyon
+	if Input.is_action_just_pressed("left_click") and !is_mouse_on_gui :
+		no_drag = true
+		
 	#Unit'leri seçmeyi sağlayan fonksiyon
-	UnitSelection()
+	if no_drag :
+		UnitSelection()
+	
+	#Mouse gui üzerinde ise dünya ile etkileşimi kesen fonksiyon 2
+	if Input.is_action_just_released("left_click") :
+		no_drag = false
 	
 	#Tüm kamera Hareketini sağlayan fonksiyon
 	CameraMovement(delta)
@@ -76,12 +87,12 @@ func UnitSelection() :
 			#Cameranın konumu çekme
 			relative_rect = position
 			#Daha önceden seçilen Unitlerin deselect edilmesi
-			if !is_mouse_on_gui:
-				for unit in weakref_selected:
-					if unit.get_ref():
-						unit.get_ref().deselect(null,null)
-				selected = []
-				dragging = true
+			for unit in weakref_selected:
+				if unit[0].get_ref():
+					unit[0].get_ref().deselect(-1)
+			selected = []
+			weakref_selected = []
+			dragging = true
 		#Seçim alanının çizimi
 		select_draw.update_status(drag_start + (relative_rect - position), mouse_position , dragging)
 	#Çizimin bitimi ve birimleri seçme
@@ -106,8 +117,16 @@ func UnitSelection() :
 		for unit in selected:
 			if unit.collider.is_in_group("unit"):
 				if unit.collider.unit_Owner == 0 :
-					unit.collider.select()
-					weakref_selected.append(weakref(unit.collider))
+					#referansların yanına drag_start a olan uzaklığın eklenmesi
+					weakref_selected.append([weakref(unit.collider),global_drag_start.distance_to(unit.collider.position)])
+		#uzaklığa göre birimlerin sıralanması
+		weakref_selected.sort()
+		#sıralanan birimlerin 0 dan başlayarak işaretlenmesi
+		var unit_Marker = 0
+		for unit in weakref_selected:
+			unit[0].get_ref().unit_Mark = unit_Marker
+			unit[0].get_ref().select()
+			unit_Marker += 1
 
 
 #Kamera Hareket vektörünü tutan değişken
