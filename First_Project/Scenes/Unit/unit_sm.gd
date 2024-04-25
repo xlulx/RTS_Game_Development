@@ -16,12 +16,14 @@ enum CommandMods {
 }
 var command_mod
 
-#Camera node'unu tutan değişken
+#nodes
 var Camera
+var Gui
 
 func _ready():
 	#Camera node'unu Camera değişkenine atar
 	Camera = get_node("/root/Game/Camera")
+	Gui = get_node("/root/Game/Gui/In-game_Menu")
 	
 	#Durumların eklenmesi
 	add_state("idle")
@@ -110,6 +112,7 @@ func _enter_state(_new_state, _old_state):
 			pass
 		#Durum "dying" ise
 		states.dying :
+			Gui.remove_unit(parent.unit_Mark)
 			#Unit'i siler
 			parent.queue_free()
 
@@ -217,4 +220,8 @@ func _on_attack_timer_timeout():
 func died():
 	set_state(states.dying)
 
-
+func best_Movement_Shape(Shape = "square"):
+	"""square"""
+	if parent.selected :
+		if Shape == "square" :
+			pass

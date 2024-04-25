@@ -1,15 +1,46 @@
-[gd_scene load_steps=5 format=3 uid="uid://dljli3qnjs15i"]
+[gd_scene load_steps=6 format=3 uid="uid://dljli3qnjs15i"]
 
 [ext_resource type="Script" path="res://Scenes/Gui/Pause_Menu.gd" id="1_e24c3"]
 [ext_resource type="Script" path="res://Scenes/Gui/In-game_Menu.gd" id="1_xnaax"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_p5uj6"]
-size = Vector2(156, 56)
+size = Vector2(244, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qfu01"]
-size = Vector2(136, 304)
+size = Vector2(136, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wehy5"]
+size = Vector2(44, 56)
 
 [node name="Gui" type="CanvasLayer"]
+
+[node name="Sources" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -320.0
+offset_bottom = 35.0
+grow_horizontal = 0
+
+[node name="MarginContainer" type="MarginContainer" parent="Sources"]
+layout_mode = 0
+offset_right = 320.0
+offset_bottom = 35.0
+
+[node name="ItemList" type="ItemList" parent="Sources/MarginContainer"]
+layout_mode = 2
+item_count = 4
+max_columns = 4
+fixed_column_width = 69
+item_0/text = "Gold:"
+item_0/selectable = false
+item_1/text = "0"
+item_1/selectable = false
+item_2/text = "Wood:"
+item_2/selectable = false
+item_3/text = "0"
+item_3/selectable = false
 
 [node name="In-game_Menu" type="Control" parent="."]
 layout_mode = 3
@@ -22,33 +53,63 @@ mouse_filter = 2
 script = ExtResource("1_xnaax")
 metadata/_edit_use_anchors_ = true
 
-[node name="Command_Panel" type="MarginContainer" parent="In-game_Menu"]
+[node name="Main_Command_Panel" type="MarginContainer" parent="In-game_Menu"]
 layout_mode = 2
 offset_left = 245.0
 offset_top = 592.0
-offset_right = 402.0
-offset_bottom = 648.0
+offset_right = 488.0
+offset_bottom = 650.0
 mouse_filter = 2
 theme_override_constants/margin_left = 5
 theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="In-game_Menu/Command_Panel"]
+[node name="Main_Commands" type="HBoxContainer" parent="In-game_Menu/Main_Command_Panel"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
-[node name="Attack_Button" type="Button" parent="In-game_Menu/Command_Panel/HBoxContainer"]
+[node name="Attack_Button" type="Button" parent="In-game_Menu/Main_Command_Panel/Main_Commands"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 mouse_filter = 1
 text = "Attack"
 
-[node name="Hold_Button" type="Button" parent="In-game_Menu/Command_Panel/HBoxContainer"]
+[node name="Hold_Button" type="Button" parent="In-game_Menu/Main_Command_Panel/Main_Commands"]
 custom_minimum_size = Vector2(70, 0)
 layout_mode = 2
 mouse_filter = 1
 text = "Hold"
+
+[node name="Formation_Button" type="Button" parent="In-game_Menu/Main_Command_Panel/Main_Commands"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/font_size = 14
+text = "		^
+Formation"
+
+[node name="Alt_Command_Panel" type="MarginContainer" parent="In-game_Menu"]
+layout_mode = 0
+offset_left = 416.0
+offset_top = 532.0
+offset_right = 461.0
+offset_bottom = 590.0
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_top = 5
+theme_override_constants/margin_right = 5
+theme_override_constants/margin_bottom = 5
+
+[node name="Formations_Box" type="HBoxContainer" parent="In-game_Menu/Alt_Command_Panel"]
+layout_mode = 2
+alignment = 1
+
+[node name="Box_Formation" type="Button" parent="In-game_Menu/Alt_Command_Panel/Formations_Box"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/font_size = 14
+text = "•••••
+•••••
+"
 
 [node name="Units_Panel" type="MarginContainer" parent="In-game_Menu"]
 layout_mode = 1
@@ -62,6 +123,7 @@ grow_vertical = 2
 
 [node name="ItemList" type="ItemList" parent="In-game_Menu/Units_Panel"]
 layout_mode = 2
+mouse_filter = 1
 max_columns = 2
 same_column_width = true
 fixed_column_width = 55
@@ -70,12 +132,16 @@ icon_mode = 0
 [node name="Area2D" type="Area2D" parent="In-game_Menu"]
 
 [node name="Command_Panel" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
-position = Vector2(322, 620)
+position = Vector2(366, 620)
 shape = SubResource("RectangleShape2D_p5uj6")
 
 [node name="Units_Panel" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
-position = Vector2(68, 328)
+position = Vector2(68, 326)
 shape = SubResource("RectangleShape2D_qfu01")
+
+[node name="Formation_Panel" type="CollisionShape2D" parent="In-game_Menu/Area2D"]
+position = Vector2(438, 560)
+shape = SubResource("RectangleShape2D_wehy5")
 
 [node name="Pause_Menu" type="Control" parent="."]
 process_mode = 3
@@ -137,8 +203,9 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 25
 text = "Back to Menu"
 
-[connection signal="pressed" from="In-game_Menu/Command_Panel/HBoxContainer/Attack_Button" to="In-game_Menu" method="_on_attack_button_pressed"]
-[connection signal="pressed" from="In-game_Menu/Command_Panel/HBoxContainer/Hold_Button" to="In-game_Menu" method="_on_hold_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/Main_Command_Panel/Main_Commands/Attack_Button" to="In-game_Menu" method="_on_attack_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/Main_Command_Panel/Main_Commands/Hold_Button" to="In-game_Menu" method="_on_hold_button_pressed"]
+[connection signal="pressed" from="In-game_Menu/Main_Command_Panel/Main_Commands/Formation_Button" to="In-game_Menu" method="_on_formation_button_pressed"]
 [connection signal="item_clicked" from="In-game_Menu/Units_Panel/ItemList" to="In-game_Menu" method="_on_item_list_item_clicked"]
 [connection signal="mouse_entered" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_entered"]
 [connection signal="mouse_exited" from="In-game_Menu/Area2D" to="In-game_Menu" method="_on_area_2d_mouse_exited"]

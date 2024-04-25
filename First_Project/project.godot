@@ -12,7 +12,7 @@ config_version=5
 
 config/name="First_Project"
 run/main_scene="res://Scenes/Gui/Main_Menu/menu.tscn"
-config/features=PackedStringArray("4.1", "Forward Plus")
+config/features=PackedStringArray("4.2", "Forward Plus")
 
 [display]
 

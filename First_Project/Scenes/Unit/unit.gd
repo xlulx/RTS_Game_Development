@@ -30,13 +30,11 @@ var possible_targets = []
 var enemy_skin = load("res://Assets/Enemy.png")
 
 #Nodes
-var items
 var Camera
 
 #başlama fonksiyonu
 func _ready():
 	Camera = get_node("/root/Game/Camera")
-	items = get_node("/root/Game/Gui/In-game_Menu/Units_Panel/ItemList")
 	
 	health_Bar.value = 20
 	health_Bar.max_value = health_Bar.value
@@ -55,7 +53,6 @@ func move_to_target(_delta, tar):
 
 #Unit seçildiğinde başlayacak fonksiyon
 func select():
-	items.add_item("Unit " + str(unit_Mark))
 	selected = true
 	$Selected.visible = true
 
@@ -63,14 +60,12 @@ func select():
 func deselect(index):
 	if selected:
 		if index == unit_Mark :
-			items.remove_item(index)
 			unit_Mark = null
 			selected = false
 			$Selected.visible = false
 			state_machine.command_mod = null
 			Camera.red_click = false
 		if index == -1 :
-			items.clear()
 			unit_Mark = null
 			selected = false
 			$Selected.visible = false

@@ -12,13 +12,15 @@ var is_mouse_on_gui = false
 
 #In-game_Menu node'unu tutan değişken
 var Gui
+var items
 
 var no_drag
 
 func _ready():
 	#In-game_Menu node'unu Gui değişkenine atama
 	Gui = get_node("/root/Game/Gui/In-game_Menu")
-
+	items = get_node("/root/Game/Gui/In-game_Menu/Units_Panel/ItemList")
+	
 func _process(delta):
 	#Farenin yeri ile bilgi alma
 	#Mouse'un ekran üzerindeki pozisyonunu alma
@@ -30,6 +32,7 @@ func _process(delta):
 	
 	#Mouse gui üzerinde ise dünya ile etkileşimi kesen fonksiyon
 	if Input.is_action_just_pressed("left_click") and !is_mouse_on_gui :
+		Gui.remove_unit(-1)
 		no_drag = true
 		
 	#Unit'leri seçmeyi sağlayan fonksiyon
@@ -118,17 +121,24 @@ func UnitSelection() :
 			if unit.collider.is_in_group("unit"):
 				if unit.collider.unit_Owner == 0 :
 					#referansların yanına drag_start a olan uzaklığın eklenmesi
-					weakref_selected.append([weakref(unit.collider),global_drag_start.distance_to(unit.collider.position)])
+					weakref_selected.append([weakref(unit.collider), global_drag_start.distance_to(unit.collider.position), 0])
 		#uzaklığa göre birimlerin sıralanması
 		weakref_selected.sort()
 		#sıralanan birimlerin 0 dan başlayarak işaretlenmesi
 		var unit_Marker = 0
 		for unit in weakref_selected:
+			#birimlerin işaretlenmesi
 			unit[0].get_ref().unit_Mark = unit_Marker
+			#birimlere seçilme sinyali yollanması
 			unit[0].get_ref().select()
+			#listedeki birimlerin işaretlenmesi
+			unit[1] = unit_Marker
+			#gui'a birimlerin eklenmesi
+			items.add_item("Unit "+str(unit[1]))
 			unit_Marker += 1
-
-
+		if selected :
+			Gui.visible = true
+			
 #Kamera Hareket vektörünü tutan değişken
 var camera_movement = Vector2.ZERO
 #Kameranın hızını tutan değişken
