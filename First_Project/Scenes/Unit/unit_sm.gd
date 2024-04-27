@@ -50,7 +50,7 @@ func _input(_event):
 			#Komut boşa alınır
 			command = Commands.NONE
 			#Hareket hedefi dünya üzerindeki mouse pozisyonua ayarlanır
-			parent.movement_target = Camera.global_mouse_position
+			parent.movement_target = formation()
 			set_state(states.moving)
 			#Üst komut kontrol edilir
 			match command_mod:
@@ -66,6 +66,7 @@ func _input(_event):
 
 #Unit'in sahip olduğu durumu gerçekleştirir
 func _state_logic(_delta):
+	
 	#Durum kontrol edilir
 	match state :
 		#Durum "idle" ise
@@ -73,23 +74,25 @@ func _state_logic(_delta):
 			pass
 		#Durum "moving" ise
 		states.moving :
+			#Unit'in kaplaması hareket yönüne baktırılır
+			skin_rotate_to(parent.movement_target)
 			#Unit hareket hedefine doğru harekete başlatılır
 			parent.move_to_target(_delta, parent.movement_target)
-			#Unit'in kaplaması hareket yönüne baktırılır
-			parent.skin.rotation = parent.position.angle_to_point(parent.movement_target)
 		#Durum "engaging" ise
 		states.engaging :
 			#Unit'in saldırı hedefi olup olmadığı kontrol edilir
 			if parent.attack_target.get_ref():
+				#Unit'in kaplaması saldırı yönüne baktırılır
+				skin_rotate_to(parent.attack_target.get_ref().position)
 				#Unit saldırı hedefine doğru harekete başlatılır
 				parent.move_to_target(_delta, parent.attack_target.get_ref().position)
-				#Unit'in kaplaması saldırı yönüne baktırılır
-				parent.skin.rotation = parent.position.angle_to_point(parent.attack_target.get_ref().position)
 			else :
 				set_state(states.idle)
 		#Durum "attacking" ise
 		states.attacking :
-			pass
+			#Unit'in kaplaması saldırı yönüne baktırılır
+			if parent.attack_target.get_ref() != null :
+				skin_rotate_to(parent.attack_target.get_ref().position)
 		#Durum "dying" ise
 		states.dying :
 			pass
@@ -143,6 +146,7 @@ func _get_transition(_delta):
 			match command:
 				#Komut "HOLD" ise
 				Commands.HOLD:
+					parent.movement_target = parent.position
 					#Unit'in menzilinde hedef var ise
 					if parent.closest_target_within_range() != null:
 						#Saldırı hedefi en yakın hedef olarak ayarlanır
@@ -220,9 +224,31 @@ func _on_attack_timer_timeout():
 func died():
 	set_state(states.dying)
 
-#Tamamlanmamış formasyon fonksiyonu
-func best_Movement_Shape(Shape = "square"):
-	"""square"""
-	if parent.selected :
-		if Shape == "square" :
-			pass
+#Unit'in kaplaması hareket yönüne baktırılır
+func skin_rotate_to(look_target):
+	parent.skin.rotation = parent.position.angle_to_point(look_target)
+
+var mouse_Position = Vector2.ZERO
+var formation_captains_position = Vector2.ZERO
+var new_tar_vector = Vector2.ZERO
+#birimler arasındaki uzaklık
+var distance_Between_Units = 60
+
+#Birimlerin verilen formasyonu almasını sağlayan fonksyon
+func formation(Shape = "square"):
+	mouse_Position = Camera.global_mouse_position
+	#Dikdörtgen fonksiyonu
+	if Shape == "square" :
+		#eğer ilk birim ise değişiklik olmaz
+		if Camera.weakref_selected[0][1] == parent.unit_Mark :
+			return mouse_Position
+		#ilk birimin formasyon kaptanı seçilmesi
+		formation_captains_position = Camera.weakref_selected[0][0].get_ref().position
+		#birazcık komplike gözüken kare formasyon formülü
+		new_tar_vector = ((formation_captains_position.distance_to(mouse_Position)*formation_captains_position.direction_to(mouse_Position))
+					+ (parent.position.distance_to(formation_captains_position)*parent.position.direction_to(formation_captains_position))
+					+ (Vector2((formation_captains_position.direction_to(mouse_Position).y * -1), formation_captains_position.direction_to(mouse_Position).x)) 
+					* distance_Between_Units * (parent.unit_Mark % 4)
+					- formation_captains_position.direction_to(mouse_Position) 
+					* distance_Between_Units * (int(parent.unit_Mark / 4)))
+		return (parent.position + new_tar_vector)

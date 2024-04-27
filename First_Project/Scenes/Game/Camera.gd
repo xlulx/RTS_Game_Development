@@ -132,6 +132,8 @@ var relative_rect = Vector2.ZERO
 @onready var select_draw = $SelectDraw
 #sürükleme başlamadan önceki maksinim sürükleme
 var max_drag = 20
+#Tek seferde en fazla seçilebilecek birim sayısı
+var max_Units = 2
 
 #Seçim karesi ile birimlerin seçilmesi
 func DrawingSelectRect() :
@@ -165,7 +167,7 @@ func DrawingSelectRect() :
 				if weak_unit.collider.unit_Owner == 0 :
 					#referansların yanına drag_start a olan uzaklığın eklenmesi
 					weakref_selected.append([weakref(weak_unit.collider)
-					, global_drag_start.distance_to(weak_unit.collider.position), 0])
+											, global_drag_start.distance_to(weak_unit.collider.position), 0])
 		
 		#Seçilen birimlerin listellerde sıralanması, gui a bildirilmesi ve işaretlenmesi
 		addingUnitMarkers()
@@ -211,12 +213,13 @@ func SummonClickAnimation() :
 		var click = Click_Animation.instantiate()
 		add_sibling(click)
 
+	
 #Bina Değişkenleri
 var last_grid  = Vector2i.ZERO
 var this_grid  = Vector2i.ZERO
 var what_to_building = []
 var buildings = {
-	"castle":[Vector2i(0,0),Vector2i(0,8)]
+	"castle" : [Vector2i(0,0),Vector2i(0,8)]
 }
 
 #Yapı yapılmasını sağlayan fonksiyon

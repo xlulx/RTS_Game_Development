@@ -14,6 +14,7 @@ var speed = 120
 var target_max = 10
 var move_threshold = 2
 var new_velocity = Vector2.ZERO
+var stopping_distance = 15
 
 #Saldırı değişkenleri
 var attack_target = null
@@ -45,11 +46,17 @@ func _ready():
 
 #Hareket etme kodu
 func move_to_target(_delta, tar):
-	nav.target_position = tar
-	velocity = Vector2.ZERO
-	new_velocity = position.direction_to(nav.get_next_path_position()) * speed
-	velocity = velocity.move_toward(new_velocity, 120)
-	move_and_slide()
+	if position.distance_to(tar) > stopping_distance :
+		nav.target_position = tar
+		velocity = Vector2.ZERO
+		new_velocity = position.direction_to(nav.get_next_path_position()) * speed
+		velocity = velocity.move_toward(new_velocity, 120)
+		move_and_slide()
+	else :
+		state_machine.command_mod = state_machine.CommandMods.NONE
+		state_machine.command = state_machine.Commands.NONE
+		state_machine.set_state(state_machine.states.idle)
+		skin.rotation = Camera.weakref_selected[0][0].get_ref().skin.rotation
 
 #Unit seçildiğinde başlayacak fonksiyon
 func select():
