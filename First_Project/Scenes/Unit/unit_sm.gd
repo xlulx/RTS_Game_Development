@@ -220,6 +220,7 @@ func _on_attack_timer_timeout():
 func died():
 	set_state(states.dying)
 
+#Tamamlanmamış formasyon fonksiyonu
 func best_Movement_Shape(Shape = "square"):
 	"""square"""
 	if parent.selected :

@@ -9,17 +9,20 @@ var global_mouse_position = Vector2.ZERO
 var is_left_pressed = false
 #Mouse'un gui üzerinde olup olmadığını tutan değişken
 var is_mouse_on_gui = false
-
-#In-game_Menu node'unu tutan değişken
-var Gui
-var items
-
 var no_drag
 
+#Node'ları tutan değişkenler
+var Gui
+var Items
+var Buildings_Map
+var Navigation
+
 func _ready():
-	#In-game_Menu node'unu Gui değişkenine atama
+	#Node değişkenlerinin çekilmesi
 	Gui = get_node("/root/Game/Gui/In-game_Menu")
-	items = get_node("/root/Game/Gui/In-game_Menu/Units_Panel/ItemList")
+	Items = get_node("/root/Game/Gui/In-game_Menu/Units_Panel/ItemList")
+	Buildings_Map = get_node("/root/Game/Navigasyon/Buildings")
+	Navigation = get_node("/root/Game/Navigasyon")
 	
 func _process(delta):
 	#Farenin yeri ile bilgi alma
@@ -29,6 +32,10 @@ func _process(delta):
 	global_mouse_position = get_global_mouse_position()
 	#Mouse'un gui üzerinde olup olmadığını kontrol etme
 	is_mouse_on_gui = Gui.is_mouse_on_gui
+	
+	#Bina yapılıp yapılmadığını kontrol eden fonksiyon
+	if what_to_building :
+		build(what_to_building)
 	
 	#Mouse gui üzerinde ise dünya ile etkileşimi kesen fonksiyon
 	if Input.is_action_just_pressed("left_click") and !is_mouse_on_gui :
@@ -57,87 +64,26 @@ func _process(delta):
 		#Click animasyonu çağıran fonksiyon
 		SummonClickAnimation()
 
-
-#Seçili unitlerin Tüm bilgisini tutan array
-var selected = []
-#Seçili unitlerin zayif bir referansını tutan array
-var weakref_selected = []
-#Farenin sürüklenip sürüklenmediğini tutan değişken
-var dragging = false
-#Farenin sürüklenmeye başladığı noktanın ekrandaki vektörü
-var drag_start = Vector2.ZERO
-#Farenin sürüklenmeye başladığı noktanın dünyadaki vektörü
-var global_drag_start = Vector2.ZERO
-#Farenin dünya üzerinde kaymaya başladığı ve kaymayı bitirdiği noktalar arasında kalan dikdörtgen
-var select_rectangle = RectangleShape2D.new()
-#Çizilen seçim dikdörtgenini hareket eden kameraya göre düzelten vektör
-var relative_rect = Vector2.ZERO
-#SelectDraw node'u tutan değişken
-@onready var select_draw = $SelectDraw
-
 #Unit'leri seçmeyi sağlayan fonksiyon
 func UnitSelection() :
-	#Sol tık basılı tutulduğu ve 10px sürüklendiği sürece çalışacak fonksiyon
-	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and 10 < drag_start.distance_to(mouse_position):
-		#Sol tık basıldığı anda çalışacak anlık fonksiyon
-		if Input.is_action_just_pressed("left_click") :
-			is_left_pressed = true
-			#Sürüklenmenin ekran üzerindeki başlangıcını alma
-			#Ekran üzerinde
-			drag_start = mouse_position
-			#Dünya üzerinde
-			global_drag_start = global_mouse_position
-			#Cameranın konumu çekme
-			relative_rect = position
+	
+	#Sol tık basıldığı anda çalışacak anlık fonksiyon
+	if Input.is_action_just_pressed("left_click") :
+		is_left_pressed = true
+		#Ekran üzerinde
+		drag_start = mouse_position
+		#Dünya üzerinde
+		global_drag_start = global_mouse_position
+		#Cameranın konumu çekme
+		relative_rect = position
+		
+		if weakref_selected :
 			#Daha önceden seçilen Unitlerin deselect edilmesi
-			for unit in weakref_selected:
-				if unit[0].get_ref():
-					unit[0].get_ref().deselect(-1)
-			selected = []
-			weakref_selected = []
-			dragging = true
-		#Seçim alanının çizimi
-		select_draw.update_status(drag_start + (relative_rect - position), mouse_position , dragging)
-	#Çizimin bitimi ve birimleri seçme
-	elif Input.is_action_just_released("left_click") and 10 < drag_start.distance_to(mouse_position) and is_left_pressed:
-		#Sürüklemenin bitişi ve ekrana çizilen karenin silinmesi
-		dragging = false
-		select_draw.update_status(drag_start + (relative_rect - position), mouse_position, dragging)
-		#Farenin sürüklenmesinin bittiği noktanın dünyadaki vektörü
-		var global_drag_end = global_mouse_position
-		#Dünya üzerinde bulunan dikdörtgenin oluşturulması
-		select_rectangle.extents = abs((global_drag_end - global_drag_start) / 2)
-		#2 boyutlu uzay oluşturulması
-		var space = get_world_2d().direct_space_state
-		var query = PhysicsShapeQueryParameters2D.new()
-		query.collision_mask = 2
-		#2 boyutlu uzayın dünya üzerindeki dikdörtgenin şeklini alması ve onun yerine götürülmesi
-		query.set_shape(select_rectangle)
-		query.transform = Transform2D(0, ((global_drag_end + global_drag_start)/2))
-		#2 boyutlu uzay ile kesişen birimlerin seçilmesi
-		selected = space.intersect_shape(query, 128)
-		#Seçilen Unitlerin select edilmesi ve zayıf bir referansının alınması
-		for unit in selected:
-			if unit.collider.is_in_group("unit"):
-				if unit.collider.unit_Owner == 0 :
-					#referansların yanına drag_start a olan uzaklığın eklenmesi
-					weakref_selected.append([weakref(unit.collider), global_drag_start.distance_to(unit.collider.position), 0])
-		#uzaklığa göre birimlerin sıralanması
-		weakref_selected.sort()
-		#sıralanan birimlerin 0 dan başlayarak işaretlenmesi
-		var unit_Marker = 0
-		for unit in weakref_selected:
-			#birimlerin işaretlenmesi
-			unit[0].get_ref().unit_Mark = unit_Marker
-			#birimlere seçilme sinyali yollanması
-			unit[0].get_ref().select()
-			#listedeki birimlerin işaretlenmesi
-			unit[1] = unit_Marker
-			#gui'a birimlerin eklenmesi
-			items.add_item("Unit "+str(unit[1]))
-			unit_Marker += 1
-		if selected :
-			Gui.visible = true
+			EmptySelectedLists()
+		
+	#Seçim karesi ile birimlerin seçilmesi
+	DrawingSelectRect()
+
 			
 #Kamera Hareket vektörünü tutan değişken
 var camera_movement = Vector2.ZERO
@@ -168,7 +114,92 @@ func CameraMovement(delta) :
 	#Kamerayı ilerletme
 	translate(camera_movement)
 
+#Seçili unitlerin Tüm bilgisini tutan array
+var selected_Units = []
+#Seçili unitlerin zayif bir referansını tutan array
+var weakref_selected = []
+#Farenin sürüklenip sürüklenmediğini tutan değişken
+var dragging = false
+#Farenin sürüklenmeye başladığı noktanın ekrandaki vektörü
+var drag_start = Vector2.ZERO
+#Farenin sürüklenmeye başladığı noktanın dünyadaki vektörü
+var global_drag_start = Vector2.ZERO
+#Farenin dünya üzerinde kaymaya başladığı ve kaymayı bitirdiği noktalar arasında kalan dikdörtgen
+var select_rectangle = RectangleShape2D.new()
+#Çizilen seçim dikdörtgenini hareket eden kameraya göre düzelten vektör
+var relative_rect = Vector2.ZERO
+#SelectDraw node'u tutan değişken
+@onready var select_draw = $SelectDraw
+#sürükleme başlamadan önceki maksinim sürükleme
+var max_drag = 20
 
+#Seçim karesi ile birimlerin seçilmesi
+func DrawingSelectRect() :
+	#Sol tık basılı tutulduğu ve max_drag geçildiği anda çalışacak fonksiyon
+	if  (Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT) and max_drag < drag_start.distance_to(mouse_position)) or dragging:
+		dragging = true
+		#Seçim alanının çizimi
+		select_draw.update_status(drag_start + (relative_rect - position), mouse_position , dragging)
+	
+	#Çizimin bitimi ve birimleri seçme
+	if (Input.is_action_just_released("left_click") and is_left_pressed) and dragging:
+		#Sürüklemenin bitişi ve ekrana çizilen karenin silinmesi
+		dragging = false
+		select_draw.update_status(drag_start + (relative_rect - position), mouse_position, dragging)
+		#Farenin sürüklenmesinin bittiği noktanın dünyadaki vektörü
+		var global_drag_end = global_mouse_position
+		#Dünya üzerinde bulunan dikdörtgenin oluşturulması
+		select_rectangle.extents = abs((global_drag_end - global_drag_start) / 2)
+		#2 boyutlu uzay oluşturulması
+		var space = get_world_2d().direct_space_state
+		var query = PhysicsShapeQueryParameters2D.new()
+		query.collision_mask = 2
+		#2 boyutlu uzayın dünya üzerindeki dikdörtgenin şeklini alması ve onun yerine götürülmesi
+		query.set_shape(select_rectangle)
+		query.transform = Transform2D(0, ((global_drag_end + global_drag_start)/2))
+		#2 boyutlu uzay ile kesişen birimlerin seçilmesi
+		selected_Units = space.intersect_shape(query, 128)
+		#Seçilen Unitlerin select edilmesi ve zayıf bir referansının alınması
+		for weak_unit in selected_Units:
+			if weak_unit.collider.is_in_group("unit"):
+				if weak_unit.collider.unit_Owner == 0 :
+					#referansların yanına drag_start a olan uzaklığın eklenmesi
+					weakref_selected.append([weakref(weak_unit.collider)
+					, global_drag_start.distance_to(weak_unit.collider.position), 0])
+		
+		#Seçilen birimlerin listellerde sıralanması, gui a bildirilmesi ve işaretlenmesi
+		addingUnitMarkers()
+
+#Seçilen birimlerin listellerde sıralanması, gui a bildirilmesi ve işaretlenmesi
+func addingUnitMarkers() :
+	#uzaklığa göre birimlerin sıralanması
+	weakref_selected.sort()
+	#sıralanan birimlerin 0 dan başlayarak işaretlenmesi
+	var unit_Marker = 0
+	for weak_unit in weakref_selected:
+		#birimlerin işaretlenmesi
+		weak_unit[0].get_ref().unit_Mark = unit_Marker
+		#birimlere seçilme sinyali yollanması
+		weak_unit[0].get_ref().select()
+		#listedeki birimlerin işaretlenmesi
+		weak_unit[1] = unit_Marker
+		#gui'a birimlerin eklenmesi
+		Items.add_item("Unit "+str(weak_unit[1]))
+		unit_Marker += 1
+	if selected_Units :
+		Gui.visible = true
+
+#Daha önceden seçilen Unitlerin deselect edilmesi
+func EmptySelectedLists() :
+	#Weakref listesinin boşaltılması
+	for weak_unit in weakref_selected:
+		if weak_unit[0].get_ref():
+			weak_unit[0].get_ref().deselect(-1)
+	
+	#Tüm değişkenlerin boşaltılması
+	selected_Units = []
+	weakref_selected = []
+	
 #click_animation sahnesini içinde tutan değişken
 var Click_Animation = preload("res://Assets/click_animation.tscn")
 #Click animasyonun kırmızı olup olmadığını tutan değişken
@@ -176,6 +207,38 @@ var red_click = false
 
 #Click animasyonu çağıran fonksiyon
 func SummonClickAnimation() :
-	if selected and !is_mouse_on_gui :
+	if selected_Units and !is_mouse_on_gui :
 		var click = Click_Animation.instantiate()
 		add_sibling(click)
+
+#Bina Değişkenleri
+var last_grid  = Vector2i.ZERO
+var this_grid  = Vector2i.ZERO
+var what_to_building = []
+var buildings = {
+	"castle":[Vector2i(0,0),Vector2i(0,8)]
+}
+
+#Yapı yapılmasını sağlayan fonksiyon
+func build(Building_Name) :
+	#Var olan grid'in tilemap'taki koordinatını yerinin çekilmesi
+	this_grid = Buildings_Map.local_to_map(global_mouse_position)
+	#Grid'ten çıkışı kontrol eden kısım
+	if last_grid != this_grid :
+		Buildings_Map.erase_cell(0,last_grid)
+	#Yapının çizgilerinin çekilmesi
+	Buildings_Map.set_cell(0, this_grid,
+								0,buildings[Building_Name][1],0)
+	#Son grid'in tilemap'taki koordinatının çekilmesi
+	last_grid = Buildings_Map.local_to_map(global_mouse_position)
+	
+	#Sol tıklandığınında binanın yerleştirilmesini sağlayan kısım
+	if Input.is_action_just_pressed("left_click") :
+		Buildings_Map.erase_cell(0,last_grid)
+		Buildings_Map.set_cell(0, Buildings_Map.local_to_map(global_mouse_position),
+									0,buildings[Building_Name][0],0)
+		what_to_building = []
+		last_grid = Vector2i.ZERO
+	
+	#Navigasyonun bina ile birlikte yeniden yapılandırılması
+	Navigation.bake_navigation_polygon()
